@@ -1,5 +1,3 @@
 imap kj <Esc>
 let mapleader = ","
-nmap <leader>e $
-nmap <leader>b 0
 set clipboard=unnamedplus,unnamed
