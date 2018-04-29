@@ -16,7 +16,7 @@ brew () {
 export ZSH=/Users/pm/.oh-my-zsh
 export APXS=/usr/local/opt/httpd/bin/apxs
 export PYTHONPATH=/usr/local/bin/python3
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/Cellar/python3/3.6.4_2/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_WORKON_CD=0
 source /usr/local/bin/virtualenvwrapper.sh
