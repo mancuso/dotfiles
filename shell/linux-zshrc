@@ -1,33 +1,20 @@
-export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
-export SANS_PYTHON="/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/library/java/home/bin"
-export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/cellar/python3/3.6.3:$SANS_PYTHON"
-
-alias python_remove="export PATH="\$SANS_PYTHON" && echo -e '\nPython Directory Removed\n'"
-alias python_add="export PATH="/usr/local/cellar/python3:\$SANS_PYTHON" && echo -e '\nPython  Directory Added\n'"
-
-brew () {
-  python_remove
-  command brew "$@"
-  python_add
-}
-
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/pm/.oh-my-zsh
-export APXS=/usr/local/opt/httpd/bin/apxs
-export PYTHONPATH=/usr/local/bin/python3
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/Cellar/python3/3.6.4_2/bin/python3
-export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_WORKON_CD=0
-source /usr/local/bin/virtualenvwrapper.sh
+  export ZSH=/home/pm/.oh-my-zsh
+
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="robbyrussell"
 
-plugins=(git)
-
-source $ZSH/oh-my-zsh.sh
+# Set list of themes to load
+# Setting this variable when ZSH_THEME=random
+# cause zsh load theme from this variable instead of
+# looking in ~/.oh-my-zsh/themes/
+# An empty array have no effect
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -71,6 +58,11 @@ source $ZSH/oh-my-zsh.sh
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+plugins=(
+  git
+)
+
+source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
