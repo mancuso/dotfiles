@@ -1,0 +1,67 @@
+execute pathogen#infect()
+syntax on
+set background=dark
+colorscheme darcula
+set autoindent
+set backspace=indent,eol,start
+"set complete-=i
+
+" Settings when compiled with support for autocommands.
+if has("autocmd")
+    " Use filetype detection and file-based automatic indenting.
+    filetype plugin indent on
+
+    " Use actual tab chars in Makefiles.
+    autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+endif
+
+" For everything else, use a tab width of 4 space chars.
+set tabstop=4       " The width of a TAB is set to 4.
+                    " Still it is a \t. It is just that
+                    " Vim will interpret it to be having
+                    " a width of 4.
+set shiftwidth=4    " Indents will have a width of 4.
+set softtabstop=4   " Sets the number of columns for a TAB.
+set expandtab       " Expand TABs to spaces.
+
+" Show line numbers
+set number
+
+" Highlight cursor line
+set cursorline
+" alternate <Esc> key
+inoremap kj <Esc>
+
+" Map Leader key for custome commands
+let mapleader = ","
+let g:mapleader = ","
+
+" Fast saving
+nmap <leader>w :w!<cr>
+
+" Fast save and quit
+nmap <leader>q :wq<cr>
+
+" Map NERDTree
+nmap <leader>n :NERDTree<cr>
+
+" Map clipboard paste on/off
+nmap <leader>p :set paste<cr>
+nmap <leader>o :set nopaste<cr> 
+
+" No cache
+set nobackup
+set nowb
+set noswapfile
+" Enables multiple visual indents
+vnoremap < <gv
+vnoremap > >gv
+source /usr/local/lib/python3.6/site-packages/powerline/bindings/vim/plugin/powerline.vim
+set laststatus=2
+set guifont=Inconsolata\ for\ Powerline:h15
+let g:Powerline_symbols = 'fancy'
+set encoding=utf-8
+set t_Co=256
+set fillchars+=stl:\ ,stlnc:\
+set term=xterm-256color
+set termencoding=utf-8
