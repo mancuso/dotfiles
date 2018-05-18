@@ -1,4 +1,4 @@
-### Configuration files for macOS High Sierra (version 10.13)
+### Configuration files for macOS High Sierra (version 10.13) and Linux
 
 
 
