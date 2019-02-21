@@ -4,6 +4,7 @@ export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/cellar/python3
 
 alias python_remove="export PATH="\$SANS_PYTHON" && echo -e '\nPython Directory Removed\n'"
 alias python_add="export PATH="/usr/local/cellar/python3:\$SANS_PYTHON" && echo -e '\nPython  Directory Added\n'"
+alias mdless='/usr/local/lib/ruby/gems/2.5.0/gems/mdless-0.0.10/bin/mdless'
 
 brew () {
   python_remove
