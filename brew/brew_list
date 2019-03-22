@@ -1,6 +1,3 @@
-
-Anaconda Directory Removed
-
 binutils
 coreutils
 diffutils
@@ -52,6 +49,3 @@ wdiff
 wget
 xz
 zsh
-
-Anaconda Directory Added
-
