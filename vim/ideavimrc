@@ -1,3 +1,0 @@
-imap kj <Esc>
-let mapleader = ","
-set clipboard=unnamedplus,unnamed

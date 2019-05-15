@@ -1,6 +1,6 @@
 export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
 export SANS_PYTHON="/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/library/java/home/bin"
-export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/cellar/python3/3.6.3:$SANS_PYTHON"
+export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/cellar/python/3.7.2_2:$SANS_PYTHON"
 
 alias python_remove="export PATH="\$SANS_PYTHON" && echo -e '\nPython Directory Removed\n'"
 alias python_add="export PATH="/usr/local/cellar/python3:\$SANS_PYTHON" && echo -e '\nPython  Directory Added\n'"
