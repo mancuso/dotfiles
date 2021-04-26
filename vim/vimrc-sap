@@ -17,7 +17,6 @@ vnoremap < <gv
 vnoremap > >gv
 " alternate <Esc> key
 inoremap kj <Esc>
-set colorcolumn=80
 highlight ColorColumn ctermbg=0 guibg=lightgrey
 set laststatus=2
 set encoding=utf-8
@@ -35,3 +34,5 @@ call plug#end()
 
 set background=dark
 colorscheme dracula
+highlight Normal ctermbg=NONE
+highlight nonText ctermbg=NONE
