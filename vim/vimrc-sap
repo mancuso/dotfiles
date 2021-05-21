@@ -29,7 +29,6 @@ set termencoding=utf-8
 call plug#begin('~/.vim/plugged')
 
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'sonph/onehalf', { 'as': 'onehalflight' }
 
 call plug#end()
 
