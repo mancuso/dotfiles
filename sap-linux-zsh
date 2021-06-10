@@ -1,0 +1,17 @@
+export ZSH=/home/pm/.oh-my-zsh
+export PYTHONPATH=/opt/rh/rh-python38/root/usr/bin/python
+
+ZSH_THEME="robbyrussell"
+
+plugins=(git)
+
+ZSH_DISABLE_COMPFIX="true"
+source $ZSH/oh-my-zsh.sh
+export LSCOLORS="EHfxcxdxBxegecabagacad"
+alias pcat='pygmentize -f terminal256 -O style=native -g'
+alias d='docker container'
+
+fpath=(~/.zsh/completion $fpath)
+autoload -Uz compinit && compinit -i
+
+HIST_STAMPS="yyyy-mm-dd"
