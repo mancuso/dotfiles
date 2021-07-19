@@ -1,0 +1,43 @@
+syntax on
+set backspace=indent,eol,start
+set tabstop=4 softtabstop=4
+set shiftwidth=4
+set expandtab
+set smartindent
+set nu
+set nohlsearch
+set nowrap
+set scrolloff=8
+set hidden
+set noerrorbells
+set nobackup
+set noswapfile
+set nobackup
+set incsearch
+
+" Enables multiple visual indents
+vnoremap < <gv
+vnoremap > >gv
+
+" alternate <Esc> key
+inoremap kj <Esc>
+
+highlight ColorColumn ctermbg=0 guibg=lightgrey
+set laststatus=2
+set encoding=utf-8
+set t_Co=256
+set fillchars+=stl:\ ,stlnc:\
+set term=xterm-256color
+set termencoding=utf-8
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+call plug#end()
+
+colorscheme dracula
+set background=dark
+highlight Normal ctermbg=NONE
+highlight nonText ctermbg=NONE
