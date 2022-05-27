@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+<short>CommVault</short>
+<description>Firewall Rules for CommVault</description>
+   <port protocol="tcp" port="8400"/>
+   <port protocol="tcp" port="8401"/>
+   <port protocol="tcp" port="8403"/>
+   <port protocol="tcp" port="8405-8420"/>
+</service>

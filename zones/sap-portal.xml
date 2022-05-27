@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>SAP Portal Servers</short>
+  <description>Portal SAP Servers that require access to S4 HANA Application Layer</description>
+        <!-- SAP Servers                                -->
+        <source address="142.240.21.201"/>               <!-- SAPPTLPRD02VM               -->
+
+        <port protocol="tcp" port="443"/>
+        <port protocol="tcp" port="3200"/>
+        <port protocol="tcp" port="3201"/>
+        <port protocol="tcp" port="3300"/>
+        <port protocol="tcp" port="3601"/>
+        <port protocol="tcp" port="8000"/>
+        <port protocol="tcp" port="8101"/>
+        <port protocol="tcp" port="8443"/>
+        <port protocol="tcp" port="30040"/>
+        <port protocol="tcp" port="44300"/>
+
+</zone>

@@ -1,0 +1,16 @@
+<zone>
+  <short>SAP Staging Servers</short>
+  <description>Existing Staging servers that require access to new S4 HANA Application Layer</description>
+	<!-- SAP Servers				-->
+        <source address="142.240.22.96"/>  		<!-- ECCPRD16VM-->
+
+        <port protocol="tcp" port="22"/>
+        <port protocol="tcp" port="443"/>
+        <port protocol="tcp" port="3200"/>
+        <port protocol="tcp" port="3300"/>
+        <port protocol="tcp" port="4237"/>
+        <port protocol="tcp" port="8000"/>
+        <port protocol="tcp" port="44300"/>
+        <port protocol="tcp" port="50200"/>
+
+</zone>

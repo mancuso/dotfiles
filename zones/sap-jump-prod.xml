@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>SAP Jump Server </short>
+  <description>SAP Jump Server access to  S4/HANA Application  Layer</description>
+        <!-- SAP Servers                                -->
+        <source address="142.240.5.113"/>               <!-- sapjmpprd01vm.civic.mississauga.ca         -->
+
+        <port protocol="tcp" port="22"/>                <!-- SSH                -->
+        <port protocol="tcp" port="443"/>               <!-- https              -->
+        <port protocol="tcp" port="3200"/>              <!-- https              -->
+        <port protocol="tcp" port="3300"/>              <!-- https              -->
+        <port protocol="tcp" port="4237"/>              <!-- https              -->
+        <port protocol="tcp" port="44300"/>             <!-- https              -->
+        <port protocol="tcp" port="1128"/>              <!-- SAPHOSTCTRL        -->
+        <port protocol="tcp" port="1129"/>              <!-- SAPHOSTCTRL        -->
+        <port protocol="tcp" port="8000"/>              <!-- ICM HTTP           -->
+        <port protocol="tcp" port="30009"/>             <!-- hdbrss             -->
+        <port protocol="tcp" port="30015"/>             <!-- indexserver        -->
+        <port protocol="tcp" port="30017"/>             <!-- staticsserver      -->
+        <port protocol="tcp" port="30041"/>             <!-- indexserver        -->
+        <port protocol="tcp" port="50013"/>             <!-- sapctrl            -->
+        <port protocol="tcp" port="50014"/>             <!-- sapctrl            -->
+
+</zone>

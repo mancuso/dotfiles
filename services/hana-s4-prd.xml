@@ -1,0 +1,49 @@
+<service>
+<short>SAP S4 HANA</short>
+<description>Firewall rules for SAP HANA S4 Application</description>
+
+
+    <port port="22" protocol="tcp"/> 		<!-- qas - ssh			-->
+    <port port="25" protocol="tcp"/> 		<!-- qas - smtp			-->
+    <port port="1128-1129" protocol="tcp"/> 	<!-- qas - upgrade		-->
+    <port port="1191" protocol="tcp"/> 		<!-- qas - gpfs			-->
+    <port port="2049" protocol="tcp"/> 		<!-- qas - nfs			-->
+    <port port="3200-3201" protocol="tcp"/> 	<!-- qas - dispatcher		-->
+    <port port="3260" protocol="tcp"/>  	<!-- qas - healthprobes		-->
+    <port port="3298" protocol="tcp"/> 		<!-- qas - niping		-->
+    <port port="3600" protocol="tcp"/> 		<!-- qas - message		-->
+    <port port="3601" protocol="tcp"/> 		<!-- qas - messageserver	-->
+    <port port="3900" protocol="tcp"/> 		<!-- qas - internal message	-->
+    <port port="4237" protocol="tcp"/>	 	<!-- qas - https		-->
+    <port port="4300" protocol="tcp"/>	 	<!-- qas - https		-->
+    <port port="4700-4701" protocol="tcp"/> 	<!-- qas - dispatcher		-->
+    <port port="4800-4801" protocol="tcp"/> 	<!-- qas - cpic-RFC		-->
+    <port port="5050" protocol="tcp"/> 		<!-- qas - dpserver		-->
+    <port port="7630" protocol="tcp"/> 		<!-- qas - hawk			-->
+    <port port="8000-8001" protocol="tcp"/> 	<!-- qas - http			-->
+    <port port="8443-8444" protocol="tcp"/> 	<!-- qas - https		-->
+    <port port="9901" protocol="tcp"/> 		<!-- qas - enrp			-->
+    <port port="30013" protocol="tcp"/>  	<!-- qas - index server		-->
+    <port port="30015" protocol="tcp"/>  	<!-- qas - index server		-->
+    <port port="30030-30033" protocol="tcp"/> 	<!-- qas - https		-->
+    <port port="30041" protocol="tcp"/> 	<!-- qas - indexserver		-->
+    <port port="30130-30133" protocol="tcp"/> 	<!-- qas - https		-->
+    <port port="30141" protocol="tcp"/> 	<!-- qas - indexserver		-->
+    <port port="44301" protocol="tcp"/> 	<!-- qas - https		-->
+    <port port="44400" protocol="tcp"/> 	<!-- qas - messageserver 	-->
+    <port port="50000-50016" protocol="tcp"/> 	<!-- qas - http			-->
+    <port port="50100-50116" protocol="tcp"/> 	<!-- qas - https		-->
+    <port port="62000" protocol="tcp"/> 	<!-- qas - healthprobes		-->
+    <port port="63000" protocol="tcp"/> 	<!-- qas - healthprobes		-->
+    <port port="62503" protocol="tcp"/> 	<!-- qas - healthprobes		-->
+    <port port="62102" protocol="tcp"/> 	<!-- qas - healthprobes		-->
+
+    <!-- Ports available to any client						-->
+    <port port="443" protocol="tcp"/>           <!-- qas - web dispatcher	-->
+    <port port="3200" protocol="tcp"/>          <!-- qas - GUI Login		-->
+    <port port="3300" protocol="tcp"/>          <!-- qas - GUI Login		-->
+    <port port="8000" protocol="tcp"/>          <!-- qas - Portal		-->
+    <port port="8001" protocol="tcp"/>          <!-- qas - Portal		-->
+    <port port="44300" protocol="tcp"/> 	<!-- qas - web dispatcher	-->
+
+</service>

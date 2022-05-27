@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+<short>S4/HANA Application Layer Nodes</short>
+
+  <description>S4/HANA Application Layer inter-nodal Communication</description>
+        <!-- SAP Servers                                -->
+        <source address="142.240.21.160"/>               <!-- s4prdasc01vml.civic.mississauga.ca         -->
+        <source address="142.240.21.124"/>               <!-- s4prdpas01vml.civic.mississauga.ca         -->
+
+	<port protocol="tcp" port="22"/>
+	<port protocol="tcp" port="443"/>
+	<port protocol="tcp" port="1125-1130"/>
+	<port protocol="tcp" port="3200-3210"/>
+	<port protocol="tcp" port="3300-3310"/>
+        <port protocol="tcp" port="3600-3610"/>
+        <port protocol="tcp" port="3900-3910"/>
+        <port protocol="tcp" port="4800-4810"/>
+        <port protocol="tcp" port="8000-8010"/>
+        <port protocol="tcp" port="8100-8110"/>
+        <port protocol="tcp" port="8443"/>
+        <port protocol="tcp" port="9000-9010"/>
+        <port protocol="tcp" port="50010-50020"/>
+        <port protocol="tcp" port="50110-50115"/>
+        <port protocol="tcp" port="49152-65535"/>
+
+
+</zone>
