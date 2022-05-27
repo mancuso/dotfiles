@@ -1,17 +1,17 @@
 # MIT License
-
+#
 # Copyright (c) 2021 Peter Mancuso
-
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,11 +22,10 @@
 
 from urllib.request import urlretrieve
 from urllib.error import URLError
-from zipfile import ZipFile
 import os
-import subprocess
 import sys
-import utility
+import stat
+import tempfile
 
 FLAGS = os.O_CREAT | os.O_EXCL | os.O_WRONLY
 VIM_DIRECTORY = ".vim"
@@ -39,16 +38,6 @@ VIM_PLUG = "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
 VIMRC = "https://raw.githubusercontent.com/mancuso/dotfiles/master/vim/vimrc-vanila"
 ZSH_INSTALL_URL = "https://raw.githubusercontent.com/robbyrussell/" \
                   "oh-my-zsh/master/tools/install.sh"
-OS_DEPENDENCIES =['zsh', 'git', 'gcc', 'make']
-
-
-def dependency_check():
-
-    for binary in OS_DEPENDENCIES:
-        if not utility.which(binary):
-            print('Install '+ binary + ' before running script')
-            sys.exit()
-
 
 def oh_my_zsh_install():
 
@@ -62,7 +51,7 @@ def oh_my_zsh_install():
             print('Reason: ', e.reason)
         elif hasattr(e, 'code'):
             print('The server couldn\'t fulfill the request.')
-            print('Error code: ', e.code)
+            print('Error code: ', e.errno)
     else:
         print("Downloaded ohmyzsh")
 
@@ -113,7 +102,7 @@ def vim_install():
             print('Reason: ', e.reason)
         elif hasattr(e, 'code'):
             print('The server couldn\'t fulfill the request.')
-            print('Error code: ', e.code)
+            print('Error code: ', e.errno)
     else:
         print("Vim Configuration File Written")
 
@@ -128,12 +117,12 @@ def vim_install():
             print('Reason: ', e.reason)
         elif hasattr(e, 'code'):
             print('The server couldn\'t fulfill the request.')
-            print('Error code: ', e.code)
+            print('Error code: ', e.errno)  
     else:
         print("Downloaded Vim-Plug")
         print("Run: PlugInstall inside vim")
 
 
-dependency_check()
 vim_install()
 oh_my_zsh_install()
+os.system("git config --global color.ui auto")
