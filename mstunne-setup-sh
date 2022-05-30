@@ -1,0 +1,284 @@
+#!/bin/bash
+
+# -----------------------------------------------------------------------
+# Copyright © Microsoft Corporation. All rights reserved.
+# 
+# mstunnel-setup - install the Microsoft Tunnel Gateway.
+# -----------------------------------------------------------------------
+
+set -e
+export TEXTDOMAIN=mstunnel
+
+# Variables
+: "${mst_cli_path:=/usr/sbin/mst-cli}"
+: "${root_path:=/etc/mstunnel}"
+: "${link_path:=/etc/ocserv}"
+: "${intune_env:=PE}"
+script_name=${0##*/}
+script_args=$@
+script_path=$0
+
+serviceUser="mstunnel"
+imageDigestFile="$root_path/images_configured"
+[ -z ${agentImageDigest} ] && agentImageDigest="sha256:588c0c59fb9e0032640e78b06cfe12c7be0b28b1d8ca01ad87fb315da4088446"
+[ -z ${serverImageDigest} ] && serverImageDigest="sha256:81d42ec83b5157068b81d6243d46601b8c003e99513426ffb90d9cbac31bd271"
+[ -s $imageDigestFile ] && source $imageDigestFile
+
+function GetAgentUri
+{
+    agent_name="mstunnel-agent"
+    if [[ "$mst_use_custom_image" == "true" || $mst_use_custom_image -eq 1 ]]
+    then
+        : "${agentImage:=mcr.microsoft.com/tunnel/gateway/agent}"
+        : "${agentImageId:=:latest}"
+    else
+        GetLatestReleaseImageIds
+        agentImage="mcr.microsoft.com/tunnel/gateway/agent"
+        : "${agentImageId:=:latest}"
+        [ ! -z "${agentImageDigest}" ] && agentImageId="@${agentImageDigest}"
+    fi
+
+    agentUri="${agentImage}${agentImageId}"
+}
+
+function ReportError
+{
+    command="$BASH_COMMAND"
+    echo ""
+    echo "Error details"
+    echo "   script: $script_path"
+    echo "   command: $command"
+    echo "   Line: $(caller)"
+    echo "   stack:"
+    local i=0
+        for cmd in "${FUNCNAME[@]:1}"
+        do
+            echo "      $(caller $i)"
+            ((i++))
+        done
+    exit 1
+}
+trap ReportError ERR
+
+function LogInfo
+{
+    echo -e "\033[40m\033[32minfo\033[39m\033[22m\033[49m": "$1"
+}
+
+function LogFail
+{
+    echo -e "\033[41m\033[30mfail\033[39m\033[22m\033[49m:" "$1" >&2
+}
+
+# The first argument is the version to check
+# The second argument is the minimum desired major version
+# The third argument is the minimum desired minor version
+function IsVersionSupported
+{
+    (( $# != 3 )) && LogFail "$FUNCNAME $(gettext "called with wrong parameters")" && return 1
+
+    [[ "$1" =~ ^([0-9]{1,})\.([0-9]{1,}) ]] && \
+    { (( ${BASH_REMATCH[1]} > $2 )) || { (( ${BASH_REMATCH[1]} == $2 )) && (( ${BASH_REMATCH[2]} >= $3 )); }; } || return 1
+}
+
+# The first argument is the kernel version
+function IsRhel8
+{
+    (( $# != 1 )) && LogFail "$FUNCNAME $(gettext "called with wrong parameters")" && return 1
+
+    [[ "$1" =~ el8 ]] || return 1
+}
+
+function CheckForDependencies
+{
+    # if we have podman use podman else use docker.
+    if podman --version &>/dev/null
+    then
+        local kv="$(uname -r)"
+        local rhel8KMv=4
+        local rhel8Kmv=18
+        local pmMv=1
+        local pmmv=6
+        local version=$(podman --version)
+        local podmanVersion=$(echo ${version//[^0-9\.]/})
+
+        if ! IsRhel8 $kv
+        then
+            echo $kv must be at least RHEL8 && return 1
+        fi
+
+        if ! IsVersionSupported $kv $rhel8KMv $rhel8Kmv
+        then
+            echo $kv must be at least ${rhel8KMv}.${rhel8Kmv}.x && return 1
+        fi
+
+        if ! IsVersionSupported $podmanVersion $pmMv $pmmv
+        then
+            echo $version must be at least ${pmMv}.${pmmv}.x && return 1
+        fi
+
+        ctr_cli=podman
+    elif docker --version &>/dev/null
+    then
+        local dMv=19
+        local dmv=03
+        local version=`docker --version`
+        local dockerVersion=$(echo ${version//[^0-9\.]/})
+        
+        if ! IsVersionSupported $dockerVersion $dMv $dmv
+        then
+             echo $version $(gettext "must be at least") ${dMv}.${dmv}.x && return 1 
+        fi
+        
+        ctr_cli=docker
+        systemctl enable docker
+
+        # Make sure that we can talk to the daemon
+        if ! docker info &>/dev/null
+        then
+            # We cannot talk to the daemon.
+            echo "$(gettext "Failed to connect to the docker daemon. Is it installed and or running?")"
+        fi
+    else
+        echo "$(gettext "Missing dependency \"docker or podman\"")" && return 1
+    fi
+}
+
+function PullImage
+{
+    GetAgentUri
+    $ctr_cli pull $agentUri
+    ValidateImage
+}
+
+function ValidateImage
+{
+    if [[ "$mst_use_custom_image" != "true" && $mst_use_custom_image -ne 1 ]]
+    then
+        local agentDigest=`$ctr_cli inspect $agentUri -f '{{index .RepoDigests 0}}' $1 | awk -F '@' '{print $2}'`
+        if [ "$agentDigest" != "$agentImageDigest" ]
+        then
+            echo "$(gettext "The expected agent image digest does not match")"
+            return 1
+        fi
+    fi
+}
+
+function InstallCaCert
+{
+    # The first parameter is the registry
+    # The second parameter is the cert.
+    local registry_name=mcr.microsoft.com
+    if [ "$ctr_cli" == "podman" ]
+    then
+        : ${certs_path:="/etc/containers/certs.d"}
+    else
+        : ${certs_path:="/etc/docker/certs.d"}
+    fi
+
+    local cert_path="${certs_path}/${registry_name}"
+    local ca_file="${cert_path}/ca.crt"
+    [ ! -e "${cert_path}" ] && mkdir -p "${cert_path}"
+    echo "${mcr_cert}" > "${ca_file}" 
+}
+
+function ShowEula
+{
+    # show the EULA
+    if [ ! -f "${root_path}/EulaAccepted" ]; 
+    then
+        $ctr_cli run --rm -it $agentUri bash -c "LANG=$LANG mstunnel eula"
+        [ ! -z "$skip_eula_prompt" ] && return 0
+        while true; do 
+            read -p "$(gettext "Do you accept the terms of the license?") ($(gettext "yes")/$(gettext "no")) : " answer
+            case ${answer,,} in 
+                "$(gettext "no")" ) exit 0;;
+                "$(gettext "yes")" ) 
+                    break;; 
+            esac
+        done
+    fi
+}
+
+function InstallScript
+{
+    # Get the mstunnel CLI
+    tmp_agent_name=mst-tmp
+    $ctr_cli rm -f $tmp_agent_name > /dev/null 2>&1 || true
+    $ctr_cli create --name $tmp_agent_name $agentUri
+    # Install Language mo files.
+    $ctr_cli cp ${tmp_agent_name}:/usr/src/mstunnel-locale.tar.gz /tmp/
+    tar -C / -xzf /tmp/mstunnel-locale.tar.gz
+    $ctr_cli cp ${tmp_agent_name}:/usr/src/mst-cli-${ctr_cli} $mst_cli_path
+    chmod +x $mst_cli_path
+    source $mst_cli_path --source-only
+}
+
+function RunningAsRoot()
+{
+    if [ `whoami` != root ];  then
+        LogFail "$(gettext "You must be root to run this command")"
+        echo "'sudo $script_path $script_args'"
+        return 1
+    fi
+}
+
+function GetLatestReleaseImageIds
+{
+    : "${mst_latest:=latest}"
+    agentManifestUrl="https://mcr.microsoft.com/v2/tunnel/gateway/agent/manifests/${mst_latest}"
+    serverManifestUrl="https://mcr.microsoft.com/v2/tunnel/gateway/server/manifests/${mst_latest}"
+    acceptHeader="Accept: application/vnd.docker.distribution.manifest.v2+json"
+    local ai=$(curl -s --head -H "$acceptHeader" "$agentManifestUrl" | awk '/docker-content-digest:/ {print $2}')
+    local si=$(curl -s --head -H "$acceptHeader" "$serverManifestUrl" | awk '/docker-content-digest:/ {print $2}')
+    [ ! -z "$ai" ] && agentImageDigest="${ai/$'\r'}" || agentImageDigest="sha256:588c0c59fb9e0032640e78b06cfe12c7be0b28b1d8ca01ad87fb315da4088446"
+    [ ! -z "$si" ] && serverImageDigest="${si/$'\r'}" || serverImageDigest="sha256:81d42ec83b5157068b81d6243d46601b8c003e99513426ffb90d9cbac31bd271"
+}
+
+mcr_cert="-----BEGIN CERTIFICATE-----
+MIIFtDCCBJygAwIBAgIQC2qzsD6xqfbEYJJqqM3+szANBgkqhkiG9w0BAQsFADBa
+MQswCQYDVQQGEwJJRTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJl
+clRydXN0MSIwIAYDVQQDExlCYWx0aW1vcmUgQ3liZXJUcnVzdCBSb290MB4XDTE2
+MDUyMDEyNTIzOFoXDTI0MDUyMDEyNTIzOFowgYsxCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpXYXNoaW5ndG9uMRAwDgYDVQQHEwdSZWRtb25kMR4wHAYDVQQKExVNaWNy
+b3NvZnQgQ29ycG9yYXRpb24xFTATBgNVBAsTDE1pY3Jvc29mdCBJVDEeMBwGA1UE
+AxMVTWljcm9zb2Z0IElUIFRMUyBDQSA0MIICIjANBgkqhkiG9w0BAQEFAAOCAg8A
+MIICCgKCAgEAq+XrXaNrOZ71NIgSux1SJl19CQvGeY6rtw7fGbLd7g/27vRW5Ebi
+kg/iZwvjHHGk1EFztMuZFo6/d32wrx5s7XEuwwh3Sl6Sruxa0EiB0MXpoPV6jx6N
+XtOtksDaxpE1MSC5OQTNECo8lx0AnpkYGAnPS5fkyfwA8AxanTboskDBSqyEKKo9
+Rhgrp4qs9K9LqH5JQsdiIMDmpztd65Afu4rYnJDjOrFswpTOPjJry3GzQS65xeFd
+2FkngvvhSA1+6ATx+QEnQfqUWn3FMLu2utcRm4j6AcxuS5K5+Hg8y5xomhZmiNCT
+sCqDLpcRHX6BIGHksLmbnG5TlZUixtm9dRC62XWMPD8d0Jb4M0V7ex9UM+VIl6cF
+JKLb0dyVriAqfZaJSHuSetAksd5IEfdnPLTf+Fhg9U97NGjm/awmCLbzLEPbT8QW
+0JsMcYexB2uG3Y+gsftm2tjL6fLwZeWO2BzqL7otZPFe0BtQsgyFSs87yC4qanWM
+wK5c2enAfH182pzjvUqwYAeCK31dyBCvLmKM3Jr94dm5WUiXQhrDUIELH4Mia+Sb
+vCkigv2AUVx1Xw41wt1/L3pnnz2OW4y7r530zAz7qB+dIcHz51IaXc4UV21QuEnu
+sQsn0uJpJxJuxsAmPuekKxuLUzgG+hqHOuBLf5kWTlk9WWnxcadlZRsCAwEAAaOC
+AUIwggE+MB0GA1UdDgQWBBR6e4zBz+egyhzUa/r74TPDDxqinTAfBgNVHSMEGDAW
+gBTlnVkwgkdYzKz6CFQ2hns6tQRN8DASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1Ud
+DwEB/wQEAwIBhjAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUF
+BwMJMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGln
+aWNlcnQuY29tMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwzLmRpZ2ljZXJ0
+LmNvbS9PbW5pcm9vdDIwMjUuY3JsMD0GA1UdIAQ2MDQwMgYEVR0gADAqMCgGCCsG
+AQUFBwIBFhxodHRwczovL3d3dy5kaWdpY2VydC5jb20vQ1BTMA0GCSqGSIb3DQEB
+CwUAA4IBAQAR/nIGOiEKN27I9SkiAmKeRQ7t+gaf77+eJDUX/jmIsrsB4Xjf0YuX
+/bd38YpyT0k66LMp13SH5LnzF2CHiJJVgr3ZfRNIfwaQOolm552W95XNYA/X4cr2
+du76mzVIoZh90pMqT4EWx6iWu9El86ZvUNoAmyqo9DUA4/0sO+3lFZt/Fg/Hjsk2
+IJTwHQG5ElBQmYHgKEIsjnj/7cae1eTK6aCqs0hPpF/kixj/EwItkBE2GGYoOiKa
+3pXxWe6fbSoXdZNQwwUS1d5ktLa829d2Wf6l1uVW4f5GXDuK+OwO++8SkJHOIBKB
+ujxS43/jQPQMQSBmhxjaMmng9tyPKPK9
+-----END CERTIFICATE-----
+"
+
+RunningAsRoot
+CheckForDependencies
+InstallCaCert
+PullImage
+ShowEula
+InstallScript
+Install
+
+# Fixing the file context on /usr/sbin/mst-cli if podman and selinux is enabled
+if [ "$ctr_cli" == "podman" ]; then
+    selinuxenabled 2> /dev/null && /sbin/restorecon -F -R -v ${mst_cli_path} || true
+fi
