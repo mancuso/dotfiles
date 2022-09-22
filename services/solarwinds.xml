@@ -1,6 +1,0 @@
-<service>
-<short>SolarWinds</short>
-<description>Firewall Rules for SolarWinds</description>
-  <port protocol="tcp" port="161"/>
-  <port protocol="udp" port="161"/>
-</service>
