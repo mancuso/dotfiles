@@ -19,7 +19,8 @@ let NERDTreeMinimalUI=1
 
 vnoremap < <gv
 vnoremap > >gv
-
+noremap <silent> <C-S-Left> :vertical resize +5<CR>
+noremap <silent> <C-S-Right> :vertical resize -5<CR>
 inoremap kj <Esc>
 
 highlight ColorColumn ctermbg=0 guibg=lightgrey
