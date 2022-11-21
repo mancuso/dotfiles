@@ -1,0 +1,27 @@
+ZSH_DISABLE_COMPFIX="true"
+export ZSH="/home/mancuso/.oh-my-zsh"
+export PYTHONPATH=/usr/bin/python3
+# VIRTUALENVWRAPPER Config
+# export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+# export WORKON_HOME=$HOME/envs
+# export VIRTUALENVWRAPPER_WORKON_CD=0
+# source /usr/local/bin/virtualenvwrapper.sh
+
+ZSH_THEME="robbyrussell"
+plugins=(git docker docker-compose docker-machine npm kubectl)
+
+ZSH_DISABLE_COMPFIX="true"
+source $ZSH/oh-my-zsh.sh
+export LSCOLORS="EHfxcxdxBxegecabagacad"
+# Use pygmentize to emmulate pcat
+alias pcat='pygmentize -f terminal256 -O style=native -g'
+alias u='uname -a'
+alias gs='git status'
+alias dev='cd ~/src/; ls -la'
+fpath=(~/.zsh/completion $fpath)
+autoload -Uz compinit && compinit -i
+
+plugins=(git docker docker-compose node npm kubectl)
+
+source $ZSH/oh-my-zsh.sh
+
